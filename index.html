@@ -267,7 +267,7 @@ const evKey=()=>S.event?String(S.event.sku||S.event.id):'none';
 const vioOf=id=>{const n=(S.notes[evKey()]||{})[(S.teams.get(id)||{}).num];return (n&&n.vio)||0;};
 
 // ======================= API =======================
-const BASE='https://www.robotevents.com/api/v2';
+const BASE='https://events.vex.com/api/v2';
 async function apiOnce(path,params,page){
   if(S.demo) return demoApi(path,params,page);
   const base=(S.settings.proxy||'').trim().replace(/\/$/,'')||BASE;
@@ -295,7 +295,7 @@ async function apiAll(path,params){
   }
 }
 function errText(e){
-  if(e.status===401||e.status===403) return 'RobotEvents rejected the API key. Check it in Settings.';
+  if(e.status===401||e.status===403) return 'The API key was rejected. Get a new key from events.vex.com/api/v2 and paste it in Settings.';
   if(e.status===429) return 'Rate limited by RobotEvents. Wait a minute then refresh.';
   if(e instanceof TypeError&&/fetch|network|load failed/i.test(e.message)) return 'The browser blocked the request (network or CORS). Check wifi, or set up the proxy from the README and paste its URL in Settings.';
   if(e.status===404) return 'Not found ('+e.message+'). Check the Proxy URL has no extra path, or clear it to call RobotEvents directly.';
