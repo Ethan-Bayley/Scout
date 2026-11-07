@@ -1,0 +1,692 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#0f172a">
+<title>VEX Scout</title>
+<style>
+:root{
+  --bg:#f4f6fa;--card:#fff;--ink:#0f172a;--mute:#64748b;--line:#e2e8f0;--accent:#2563eb;
+  --red:#dc2626;--redbg:#fee2e2;--blue:#2563eb;--bluebg:#dbeafe;--good:#16a34a;--warn:#d97706;--me:#fde68a;
+}
+body.dark{
+  --bg:#0b1020;--card:#151c30;--ink:#e6ebf5;--mute:#93a0b8;--line:#25304a;--accent:#60a5fa;
+  --red:#f87171;--redbg:#3b1620;--blue:#60a5fa;--bluebg:#13284a;--good:#4ade80;--warn:#fbbf24;--me:#5b4a10;
+}
+*{box-sizing:border-box}
+html,body{margin:0;background:var(--bg);color:var(--ink);font:15px/1.4 system-ui,-apple-system,Segoe UI,Roboto,sans-serif;-webkit-text-size-adjust:100%}
+header{position:sticky;top:0;z-index:5;background:var(--card);border-bottom:1px solid var(--line);padding:8px 12px;padding-top:max(8px,env(safe-area-inset-top))}
+.hrow{display:flex;gap:8px;align-items:center}
+.title{font-weight:700;font-size:15px;flex:1;min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.sub{font-size:12px;color:var(--mute)}
+main{padding:10px 10px 90px;max-width:1100px;margin:0 auto}
+nav{position:fixed;bottom:0;left:0;right:0;background:var(--card);border-top:1px solid var(--line);display:flex;padding-bottom:env(safe-area-inset-bottom);z-index:6}
+nav button{flex:1;padding:10px 2px;border:0;background:none;color:var(--mute);font-size:12px;font-weight:600}
+nav button.on{color:var(--accent);box-shadow:inset 0 2px 0 var(--accent)}
+nav button span{display:block;font-size:18px}
+button,input,select,textarea{font:inherit;color:inherit}
+.btn{background:var(--accent);color:#fff;border:0;border-radius:8px;padding:8px 12px;font-weight:600}
+.btn.ghost{background:none;color:var(--accent);border:1px solid var(--line)}
+.btn.sm{padding:4px 8px;font-size:12px}
+input,select,textarea{background:var(--bg);border:1px solid var(--line);border-radius:8px;padding:8px;width:100%}
+label{display:block;font-size:12px;color:var(--mute);margin:10px 0 3px}
+.card{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:10px;margin-bottom:10px}
+.banner{background:var(--redbg);color:var(--red);border-radius:8px;padding:8px 10px;margin:8px 0;font-size:13px}
+.banner.info{background:var(--bluebg);color:var(--blue)}
+.toolbar{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:8px;align-items:center}
+.toolbar select,.toolbar input{width:auto;flex:1;min-width:110px}
+.chip{display:inline-block;border:1px solid var(--line);border-radius:999px;padding:2px 8px;font-size:12px;margin:2px 2px 2px 0;background:var(--bg)}
+.chip.on{background:var(--accent);color:#fff;border-color:var(--accent)}
+.match .mh{display:flex;justify-content:space-between;font-size:12px;color:var(--mute);margin-bottom:6px;gap:6px}
+.match .mh b{color:var(--ink);font-size:14px}
+.match.mine{box-shadow:0 0 0 2px var(--accent)}
+.sides{display:grid;grid-template-columns:1fr 1fr;gap:6px}
+.side{border-radius:8px;padding:6px}
+.side.red{background:var(--redbg)}
+.side.blue{background:var(--bluebg)}
+.side .t{display:flex;justify-content:space-between;font-size:14px;padding:2px 3px;border-radius:5px;cursor:pointer}
+.side .t.me{background:var(--me);font-weight:700}
+.side .t small{color:var(--mute)}
+.side .tot{display:flex;justify-content:space-between;border-top:1px solid rgba(128,128,128,.3);margin-top:4px;padding-top:4px;font-weight:700}
+.side.red .tot b{color:var(--red)}.side.blue .tot b{color:var(--blue)}
+.bar{height:8px;border-radius:4px;overflow:hidden;display:flex;margin-top:8px;background:var(--line)}
+.bar i{display:block}
+.bar .r{background:var(--red)}.bar .b{background:var(--blue)}
+.badge{font-size:11px;border-radius:5px;padding:1px 6px;background:var(--line);color:var(--mute)}
+.badge.done{background:var(--good);color:#fff}
+.tw{overflow-x:auto;border:1px solid var(--line);border-radius:12px;background:var(--card)}
+table{border-collapse:collapse;width:100%;font-size:13px;white-space:nowrap}
+th,td{padding:6px 8px;border-bottom:1px solid var(--line);text-align:right}
+th{position:sticky;top:0;background:var(--card);color:var(--mute);font-size:11px;cursor:pointer;user-select:none}
+td:first-child,th:first-child,td:nth-child(2),th:nth-child(2){text-align:left}
+tr.me td{background:var(--me)}
+tr:hover td{background:rgba(128,128,128,.08)}
+.team{font-weight:700;cursor:pointer;color:var(--accent)}
+.pick{display:flex;gap:8px;align-items:flex-start}
+.pick .n{font-weight:800;color:var(--mute);width:22px}
+.pick .body{flex:1;min-width:0}
+.pick .sc{text-align:right;font-weight:800}
+.pick.gone{opacity:.55}
+.kv{display:grid;grid-template-columns:repeat(auto-fill,minmax(110px,1fr));gap:6px}
+.kv div{background:var(--bg);border-radius:8px;padding:6px 8px}
+.kv small{display:block;color:var(--mute);font-size:11px}
+.kv b{font-size:16px}
+dialog{border:0;border-radius:14px;padding:0;width:min(640px,94vw);max-height:90vh;background:var(--card);color:var(--ink)}
+dialog::backdrop{background:rgba(0,0,0,.5)}
+.dh{display:flex;justify-content:space-between;align-items:center;padding:10px 14px;border-bottom:1px solid var(--line);position:sticky;top:0;background:var(--card)}
+.db{padding:10px 14px 16px}
+.row2{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.stars button{background:none;border:0;font-size:22px;color:var(--line);padding:0 2px}
+.stars button.on{color:var(--warn)}
+.empty{color:var(--mute);text-align:center;padding:30px 10px}
+h3{margin:4px 0 8px;font-size:14px}
+.list li{display:flex;gap:6px;align-items:center;padding:6px 0;border-bottom:1px solid var(--line)}
+.list{list-style:none;padding:0;margin:0}
+.list .grow{flex:1}
+code{background:var(--bg);padding:1px 4px;border-radius:4px}
+</style>
+</head>
+<body>
+<header>
+  <div class="hrow">
+    <div class="title" id="hTitle">VEX Scout</div>
+    <select id="divSel" style="width:auto;display:none"></select>
+    <button class="btn sm" id="refreshBtn">Refresh</button>
+  </div>
+  <div class="sub" id="hSub"></div>
+</header>
+<main id="main"></main>
+<nav id="nav">
+  <button data-tab="matches"><span>🎮</span>Matches</button>
+  <button data-tab="teams"><span>📊</span>Teams</button>
+  <button data-tab="picks"><span>🤝</span>Picks</button>
+  <button data-tab="picklist"><span>📋</span>Picklist</button>
+  <button data-tab="settings"><span>⚙️</span>Settings</button>
+</nav>
+<dialog id="dlg"></dialog>
+
+<script>
+"use strict";
+//<CORE>
+// ======================= CORE LOGIC (no DOM) =======================
+function normCdf(z){ // Abramowitz-Stegun erf approximation
+  const t=1/(1+0.3275911*Math.abs(z)/Math.SQRT2);
+  const y=1-(((((1.061405429*t-1.453152027)*t)+1.421413741)*t-0.284496736)*t+0.254829592)*t*Math.exp(-z*z/2);
+  return z>=0?0.5*(1+y):0.5*(1-y);
+}
+function cholSolve(A,b,n){
+  const L=new Float64Array(n*n);
+  for(let i=0;i<n;i++){
+    for(let j=0;j<=i;j++){
+      let s=A[i*n+j];
+      for(let k=0;k<j;k++) s-=L[i*n+k]*L[j*n+k];
+      if(i===j) L[i*n+i]=Math.sqrt(Math.max(s,1e-9));
+      else L[i*n+j]=s/L[j*n+j];
+    }
+  }
+  const y=new Float64Array(n), x=new Float64Array(n);
+  for(let i=0;i<n;i++){ let s=b[i]; for(let k=0;k<i;k++) s-=L[i*n+k]*y[k]; y[i]=s/L[i*n+i]; }
+  for(let i=n-1;i>=0;i--){ let s=y[i]; for(let k=i+1;k<n;k++) s-=L[k*n+i]*x[k]; x[i]=s/L[i*n+i]; }
+  return x;
+}
+// rows: [{t:[teamIds], y:score, w:weight}]. Ridge toward a common mean per team.
+function fitRidge(rows, teamIds, lambda){
+  const idx=new Map(); teamIds.forEach((id,i)=>idx.set(id,i));
+  const n=teamIds.length; if(!n) return {est:new Map(),mu:0};
+  let sw=0, sy=0;
+  for(const r of rows){ if(!r.t.length) continue; sw+=r.w; sy+=r.w*r.y/r.t.length; }
+  const mu=sw?sy/sw:0;
+  const A=new Float64Array(n*n), b=new Float64Array(n);
+  for(const r of rows){
+    const ids=r.t.map(t=>idx.get(t)).filter(i=>i!==undefined);
+    if(!ids.length) continue;
+    const res=r.y-ids.length*mu;
+    for(const p of ids){ b[p]+=r.w*res; for(const q of ids) A[p*n+q]+=r.w; }
+  }
+  for(let i=0;i<n;i++) A[i*n+i]+=lambda;
+  const d=cholSolve(A,b,n);
+  const est=new Map(); teamIds.forEach((id,i)=>est.set(id,mu+d[i]));
+  return {est,mu};
+}
+function sideRows(matches, opp){
+  const rows=[];
+  for(const m of matches){
+    if(!m.scored||m.round!==2) continue;
+    for(const [me,other] of [[m.red,m.blue],[m.blue,m.red]]){
+      const t=me.teams.filter(x=>!x.sitting).map(x=>x.id);
+      if(t.length) rows.push({t,y:opp?other.score:me.score,w:1,mid:m.id});
+    }
+  }
+  return rows;
+}
+// Build all team ratings for one division
+function buildModel(matches, priorRows, teamIdsExtra, opts){
+  opts=opts||{}; const lambda=opts.lambda||3;
+  const evRows=sideRows(matches,false), dprRows=sideRows(matches,true);
+  const ids=new Set(teamIdsExtra||[]);
+  for(const r of evRows) r.t.forEach(t=>ids.add(t));
+  const evIds=[...ids];
+  const prior=(priorRows||[]).map(r=>({t:r.t,y:r.y,w:0.5}));
+  const all=new Set(evIds); prior.forEach(r=>r.t.forEach(t=>all.add(t)));
+  const fit=fitRidge(evRows.concat(prior),[...all],lambda);
+  const opr=fitRidge(evRows,evIds,0.05), dpr=fitRidge(dprRows,evIds,0.05);
+  const epa=new Map(), cc=new Map();
+  for(const id of evIds){
+    epa.set(id,fit.est.get(id)); cc.set(id,opr.est.get(id)-dpr.est.get(id));
+  }
+  // residuals
+  let ss=0,cnt=0; const res=new Map();
+  for(const r of evRows){
+    const pred=r.t.reduce((s,t)=>s+(epa.get(t)||0),0), e=r.y-pred;
+    ss+=e*e; cnt++;
+    for(const t of r.t){ if(!res.has(t)) res.set(t,[]); res.get(t).push(e); }
+  }
+  const rmse=Math.max(5,cnt>3?Math.sqrt(ss/cnt):15);
+  const stats=new Map();
+  for(const id of evIds){
+    const e=res.get(id)||[]; const n=e.length;
+    const sd=n>1?Math.sqrt(e.reduce((s,x)=>s+x*x,0)/n):null;
+    stats.set(id,{games:n,sigma:sd});
+  }
+  for(const id of evIds){
+    const sc=[];
+    for(const r of evRows) if(r.t.includes(id)) sc.push(r.y);
+    const st=stats.get(id); st.avg=sc.length?sc.reduce((a,b)=>a+b,0)/sc.length:null; st.high=sc.length?Math.max(...sc):null;
+  }
+  return {epa,opr:opr.est,dpr:dpr.est,ccwm:cc,mu:fit.mu*2/2,rmse,stats,scoredCount:cnt/2};
+}
+function epaTrend(matches, teamIds, points){
+  const q=matches.filter(m=>m.scored&&m.round===2).sort((a,b)=>a.num-b.num);
+  const out=new Map(); if(q.length<4) return out;
+  const cps=[]; for(let j=1;j<=points;j++){ const i=Math.max(3,Math.round(q.length*j/points)); if(!cps.includes(i)) cps.push(i); }
+  for(const i of cps){
+    const sub=q.slice(0,i); const rows=sideRows(sub,false);
+    const ids=new Set(teamIds);
+    const fit=fitRidge(rows,[...ids],3);
+    const played=new Map(); rows.forEach(r=>r.t.forEach(t=>played.set(t,(played.get(t)||0)+1)));
+    for(const id of ids){ if(!played.get(id)) continue; if(!out.has(id)) out.set(id,[]); out.get(id).push({m:sub[sub.length-1].num,v:fit.est.get(id)}); }
+  }
+  return out;
+}
+function predictMatch(model, m){
+  const sum=side=>side.teams.filter(t=>!t.sitting).reduce((s,t)=>s+(model.epa.get(t.id)??model.mu),0);
+  const r=sum(m.red), b=sum(m.blue);
+  const p=normCdf((r-b)/(Math.SQRT2*model.rmse));
+  return {red:r,blue:b,pRed:p};
+}
+function zscores(map){
+  const v=[...map.values()].filter(x=>x!=null&&isFinite(x)); if(!v.length) return ()=>0;
+  const mean=v.reduce((a,b)=>a+b,0)/v.length; const sd=Math.sqrt(v.reduce((a,b)=>a+(b-mean)**2,0)/v.length)||1;
+  return id=>{ const x=map.get(id); return x==null||!isFinite(x)?0:(x-mean)/sd; };
+}
+const PICK_W={epa:1.0,prog:0.25,driver:0.12,steady:0.2};
+function pickScorer(model, skills, teamIds, vio){
+  const epaZ=zscores(model.epa);
+  const prog=new Map(), drv=new Map(), sig=new Map();
+  for(const id of teamIds){ const s=skills.get(id)||{}; prog.set(id,s.prog??0); drv.set(id,s.driver??0); const st=model.stats.get(id); if(st&&st.sigma!=null) sig.set(id,st.sigma); }
+  const pZ=zscores(prog), dZ=zscores(drv), sZ=zscores(sig);
+  return id=>PICK_W.epa*epaZ(id)+PICK_W.prog*pZ(id)+PICK_W.driver*dZ(id)-PICK_W.steady*sZ(id)-0.3*((vio&&vio.get(id))||0);
+}
+// Projects alliance selection. rankOrder: team ids by qual rank. Returns who is likely gone before `me` picks.
+function simulateSelection(rankOrder, score, nAlliances, me){
+  const picked=new Set(), caps=new Set(), pairs=[]; const pickedBy=new Map();
+  let status='unplaced', pool=[];
+  for(const t of rankOrder){
+    if(picked.has(t)){ if(t===me){ status='picked'; } if(t===me) break; continue; }
+    if(caps.size>=nAlliances){ break; }
+    if(t===me){ status='captain'; break; }
+    caps.add(t);
+    let best=null,bs=-1e9;
+    for(const c of rankOrder){ if(c===t||picked.has(c)||caps.has(c)) continue; const s=score(c); if(s>bs){bs=s;best=c;} }
+    if(best!==null){ picked.add(best); pickedBy.set(best,t); pairs.push([t,best]); }
+  }
+  if(status==='unplaced'&&picked.has(me)) status='picked';
+  const gone=new Set([...picked,...caps]); gone.delete(me);
+  return {status,pairs,gone,pickedBy,caps,myPickedBy:pickedBy.get(me)||null};
+}
+//</CORE>
+
+// ======================= STATE & STORAGE =======================
+const LS={get(k,d){try{const v=localStorage.getItem(k);return v?JSON.parse(v):d}catch(e){return d}},set(k,v){try{localStorage.setItem(k,JSON.stringify(v));return true}catch(e){return false}}};
+const DEFAULTS={apiKey:'',proxy:'',team:'4613A',sku:'',alliances:8,usePrior:true,refresh:0,dark:null};
+const S={
+  settings:Object.assign({},DEFAULTS,LS.get('vs.settings',{})),
+  tab:'matches',event:null,divs:[],div:null,teams:new Map(),numToId:new Map(),
+  matches:{},rankings:{},skills:new Map(),prior:[],model:{},trend:{},
+  notes:LS.get('vs.notes',{}),picklist:LS.get('vs.picklist',{}),
+  filter:'mine',sort:{k:'epa',dir:-1},search:'',status:'',error:'',offline:false,loading:false,found:[],demo:false,timer:null
+};
+const $=s=>document.querySelector(s);
+const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const f1=x=>x==null||!isFinite(x)?'-':x.toFixed(1);
+const saveSettings=()=>LS.set('vs.settings',S.settings);
+const myNum=()=>(S.settings.team||'').trim().toUpperCase();
+const myId=()=>S.numToId.get(myNum())??null;
+const evKey=()=>S.event?String(S.event.sku||S.event.id):'none';
+const vioOf=id=>{const n=(S.notes[evKey()]||{})[(S.teams.get(id)||{}).num];return (n&&n.vio)||0;};
+
+// ======================= API =======================
+const BASE='https://www.robotevents.com/api/v2';
+async function apiOnce(path,params,page){
+  if(S.demo) return demoApi(path,params,page);
+  const base=(S.settings.proxy||'').trim().replace(/\/$/,'')||BASE;
+  const u=new URL(base+path);
+  for(const [k,v] of Object.entries(params||{})){
+    if(Array.isArray(v)) v.forEach(x=>u.searchParams.append(k+'[]',x)); else u.searchParams.set(k,v);
+  }
+  u.searchParams.set('per_page','250'); u.searchParams.set('page',page);
+  const h={Accept:'application/json'}; if(S.settings.apiKey) h.Authorization='Bearer '+S.settings.apiKey.trim();
+  const r=await fetch(u.toString(),{method:'GET',headers:h});
+  if(!r.ok){ const e=new Error('HTTP '+r.status); e.status=r.status; throw e; }
+  return r.json();
+}
+async function apiAll(path,params){
+  const ck='vs.c.'+path+JSON.stringify(params||{});
+  try{
+    let out=[],page=1,last=1;
+    do{ const j=await apiOnce(path,params,page); out=out.concat(j.data||[]); last=(j.meta&&j.meta.last_page)||1; page++; }while(page<=last&&page<40);
+    if(!S.demo&&path.indexOf('/matches')<0||out.length<1500) LS.set(ck,{t:Date.now(),d:out});
+    return out;
+  }catch(e){
+    const c=!S.demo&&LS.get(ck,null);
+    if(c){ S.offline=true; return c.d; }
+    throw e;
+  }
+}
+function errText(e){
+  if(e.status===401||e.status===403) return 'RobotEvents rejected the API key. Check it in Settings.';
+  if(e.status===429) return 'Rate limited by RobotEvents. Wait a minute then refresh.';
+  if(e instanceof TypeError&&/fetch|network|load failed/i.test(e.message)) return 'The browser blocked the request (network or CORS). Check wifi, or set up the proxy from the README and paste its URL in Settings.';
+  return 'Request failed ('+(e.name||'Error')+': '+e.message+').';
+}
+async function pool(items,n,fn){
+  let i=0; await Promise.all(Array.from({length:n},async()=>{ while(i<items.length){ const x=items[i++]; try{await fn(x);}catch(e){} } }));
+}
+
+// ======================= DATA LOAD =======================
+function normMatch(m,div){
+  const al={};
+  for(const a of (m.alliances||[])) al[a.color]={score:a.score||0,teams:(a.teams||[]).map(t=>({id:t.team.id,num:(t.team.name||t.team.code||'').toUpperCase(),sitting:!!t.sitting}))};
+  const red=al.red||{score:0,teams:[]}, blue=al.blue||{score:0,teams:[]};
+  return {id:m.id,round:m.round,inst:m.instance,num:m.matchnum,field:m.field||'',time:m.started||m.scheduled||null,
+    scored:m.scored===true||(!!m.started&&red.score+blue.score>0),red,blue,div};
+}
+const ROUND_ORDER={1:0,2:1,7:2,6:3,3:4,4:5,5:6};
+function matchLabel(m){
+  switch(m.round){case 1:return 'P'+m.num;case 2:return 'Q'+m.num;case 3:return 'QF'+m.inst+'-'+m.num;case 4:return 'SF'+m.inst+'-'+m.num;case 5:return 'F-'+m.num;case 6:return 'R16 '+m.inst+'-'+m.num;case 7:return 'R32 '+m.inst+'-'+m.num;default:return 'M'+m.num;}
+}
+function sortMatches(a,b){ return (ROUND_ORDER[a.round]??9)-(ROUND_ORDER[b.round]??9)||a.inst-b.inst||a.num-b.num; }
+
+async function loadEvent(sku){
+  S.loading=true;S.error='';S.offline=false;render();
+  try{
+    const ev=await apiAll('/events',{sku:[sku]});
+    if(!ev.length) throw new Error('No event with SKU '+sku);
+    S.event=ev[0]; S.settings.sku=ev[0].sku; saveSettings();
+    S.divs=(S.event.divisions&&S.event.divisions.length)?S.event.divisions.slice().sort((a,b)=>(a.order||0)-(b.order||0)):[{id:1,name:'Division 1'}];
+    const tl=await apiAll('/events/'+S.event.id+'/teams');
+    S.teams=new Map(); S.numToId=new Map();
+    for(const t of tl){ const num=(t.number||'').toUpperCase(); S.teams.set(t.id,{id:t.id,num,name:t.team_name||'',org:t.organization||'',city:(t.location&&t.location.city)||''}); S.numToId.set(num,t.id); }
+    await refreshData(true);
+    S.prior=[];
+    if(S.settings.usePrior) loadPrior();
+  }catch(e){ S.error=errText(e); }
+  S.loading=false; render();
+}
+async function refreshData(first){
+  if(!S.event) return;
+  S.offline=false;
+  try{
+    for(const d of S.divs){
+      const [ms,rk]=await Promise.all([
+        apiAll('/events/'+S.event.id+'/divisions/'+d.id+'/matches'),
+        apiAll('/events/'+S.event.id+'/divisions/'+d.id+'/rankings')]);
+      S.matches[d.id]=ms.map(m=>normMatch(m,d.id)).sort(sortMatches);
+      S.rankings[d.id]=rk.map(r=>({id:r.team.id,num:(r.team.name||'').toUpperCase(),rank:r.rank,w:r.wins,l:r.losses,t:r.ties,wp:r.wp,ap:r.ap,sp:r.sp,high:r.high_score,avg:r.average_points}));
+      for(const m of S.matches[d.id]) for(const s of [m.red,m.blue]) for(const t of s.teams) if(!S.teams.has(t.id)){ S.teams.set(t.id,{id:t.id,num:t.num,name:'',org:'',city:''}); S.numToId.set(t.num,t.id); }
+    }
+    const sk=await apiAll('/events/'+S.event.id+'/skills').catch(()=>[]);
+    S.skills=new Map();
+    for(const r of sk){ const id=r.team.id; const o=S.skills.get(id)||{driver:0,prog:0}; if(r.type==='driver') o.driver=Math.max(o.driver,r.score); else if(r.type==='programming') o.prog=Math.max(o.prog,r.score); S.skills.set(id,o); }
+    const arr=[...S.skills.entries()].sort((a,b)=>(b[1].driver+b[1].prog)-(a[1].driver+a[1].prog)); arr.forEach(([id,o],i)=>o.rank=i+1);
+    S.status='Updated '+new Date().toLocaleTimeString([], {hour:'2-digit',minute:'2-digit'});
+    if(first){ // choose division containing my team
+      const mid=myId(); const hit=S.divs.find(d=>(S.matches[d.id]||[]).some(m=>[...m.red.teams,...m.blue.teams].some(t=>t.id===mid)));
+      S.div=(hit||S.divs[0]).id;
+    }
+    S.error='';
+  }catch(e){ S.error=errText(e); }
+  computeAll(); render();
+}
+async function loadPrior(){
+  const seasonId=S.event.season&&S.event.season.id; if(!seasonId) return;
+  const ids=[]; for(const d of S.divs) { const set=new Set(); (S.matches[d.id]||[]).forEach(m=>[...m.red.teams,...m.blue.teams].forEach(t=>set.add(t.id))); set.forEach(x=>ids.push(x)); }
+  const rows=new Map(); let done=0;
+  S.status='Loading season history 0/'+ids.length; render();
+  await pool([...new Set(ids)],4,async id=>{
+    const ck='vs.p.'+id+'.'+seasonId; const c=LS.get(ck,null); let list;
+    if(c&&Date.now()-c.t<6*3600e3) list=c.d;
+    else{
+      const ms=await apiAll('/teams/'+id+'/matches',{season:[seasonId],round:[2]});
+      list=[]; for(const m of ms){ if(m.event&&m.event.id===S.event.id) continue; if(!(m.scored||m.started)) continue; for(const a of (m.alliances||[])){ if(!a.score&&a.score!==0) continue; list.push({k:m.id+a.color,t:(a.teams||[]).filter(x=>!x.sitting).map(x=>x.team.id),y:a.score}); } }
+      LS.set(ck,{t:Date.now(),d:list});
+    }
+    for(const r of list) rows.set(r.k,{t:r.t,y:r.y});
+    done++; if(done%5===0){ S.status='Loading season history '+done+'/'+ids.length; $('#hSub').textContent=S.status; }
+  });
+  S.prior=[...rows.values()]; S.status=S.prior.length?'Updated (with season history)':'Updated '+new Date().toLocaleTimeString([], {hour:'2-digit',minute:'2-digit'});
+  computeAll(); render();
+}
+
+// ======================= COMPUTE =======================
+function divTeamIds(d){
+  const s=new Set(); (S.matches[d]||[]).forEach(m=>[...m.red.teams,...m.blue.teams].forEach(t=>s.add(t.id))); (S.rankings[d]||[]).forEach(r=>s.add(r.id));
+  return [...s];
+}
+function computeAll(){
+  S.model={};S.trend={};
+  for(const d of S.divs){
+    const ids=divTeamIds(d.id);
+    const model=buildModel(S.matches[d.id]||[],S.settings.usePrior?S.prior:[],ids);
+    const rk=new Map((S.rankings[d.id]||[]).map(r=>[r.id,r]));
+    const order=ids.slice().sort((a,b)=>{ const ra=rk.get(a),rb=rk.get(b); if(ra&&rb) return ra.rank-rb.rank; if(ra) return -1; if(rb) return 1; return (model.epa.get(b)||0)-(model.epa.get(a)||0); });
+    S.model[d.id]={model,ids,rk,order,trend:epaTrend(S.matches[d.id]||[],ids,8)};
+  }
+}
+const cur=()=>S.model[S.div]||null;
+
+// ======================= RENDER =======================
+function render(){
+  document.body.classList.toggle('dark',S.settings.dark===null?matchMedia('(prefers-color-scheme:dark)').matches:!!S.settings.dark);
+  document.querySelectorAll('nav button').forEach(b=>b.classList.toggle('on',b.dataset.tab===S.tab));
+  $('#hTitle').textContent=S.event?S.event.name:'VEX Scout';
+  const ds=$('#divSel');
+  if(S.divs.length>1){ ds.style.display=''; ds.innerHTML=S.divs.map(d=>`<option value="${d.id}" ${d.id===S.div?'selected':''}>${esc(d.name)}</option>`).join(''); } else ds.style.display='none';
+  const c=cur(); let sub=S.loading?'Loading...':S.status;
+  if(c){ const q=c.model.scoredCount; const tot=(S.matches[S.div]||[]).filter(m=>m.round===2).length; sub+=` · ${q}/${tot} quals scored`; if(S.demo) sub+=' · DEMO'; if(S.offline) sub+=' · offline cache'; }
+  $('#hSub').textContent=sub;
+  const m=$('#main'); let html='';
+  if(S.error) html+=`<div class="banner">${esc(S.error)}</div>`;
+  if(S.tab==='settings') html+=viewSettings();
+  else if(!c) html+=`<div class="empty">${S.loading?'Loading event data...':'No event loaded yet.<br><br><button class="btn" data-act="goSettings">Open Settings</button> &nbsp; <button class="btn ghost" data-act="demo">Try demo</button>'}</div>`;
+  else html+=S.tab==='matches'?viewMatches(c):S.tab==='teams'?viewTeams(c):S.tab==='picks'?viewPicks(c):viewPicklist(c);
+  const keep=m.scrollTop; m.innerHTML=html;
+}
+function tnum(id){ const t=S.teams.get(id); return t?t.num:'?'; }
+function teamLink(id){ return `<span class="team" data-team="${id}">${esc(tnum(id))}</span>`; }
+
+function viewMatches(c){
+  const ms=S.matches[S.div]||[]; const mid=myId();
+  const has=m=>[...m.red.teams,...m.blue.teams].some(t=>t.id===mid);
+  const f=S.filter; let list=ms;
+  if(f==='mine'&&mid) list=ms.filter(has); else if(f==='next') list=ms.filter(m=>!m.scored).slice(0,12); else if(f==='played') list=ms.filter(m=>m.scored).reverse();
+  if(f==='mine'&&!mid) list=ms;
+  const tabs=[['mine',mid?'My matches':'All matches'],['next','Upcoming'],['played','Played'],['all','All']];
+  let h=`<div class="toolbar">${tabs.map(([k,l])=>`<span class="chip ${f===k?'on':''}" data-filter="${k}">${l}</span>`).join('')}</div>`;
+  if(!mid&&myNum()) h+=`<div class="banner info">Team ${esc(myNum())} was not found at this event so all matches are shown.</div>`;
+  if(!list.length) return h+'<div class="empty">No matches to show yet. The schedule may not be published.</div>';
+  const avgAll=c.model.mu*2;
+  return h+list.map(m=>{
+    const p=predictMatch(c.model,m); const mine=has(m);
+    const side=(s,col,pred)=>`<div class="side ${col}">${s.teams.map(t=>`<div class="t ${t.id===mid?'me':''}" data-team="${t.id}"><span>${esc(t.num)}${t.sitting?' <small>(sit)</small>':''}</span><small>${f1(c.model.epa.get(t.id)??c.model.mu)}</small></div>`).join('')}
+      <div class="tot"><span>${m.scored?'Score':'Pred'} ${m.scored?`<small>(pred ${f1(pred)})</small>`:''}</span><b>${m.scored?s.score:f1(pred)}</b></div></div>`;
+    const pr=Math.round(p.pRed*100);
+    const win=m.scored?(m.red.score>m.blue.score?'Red won':m.blue.score>m.red.score?'Blue won':'Tie'):`${pr>=50?'Red':'Blue'} ${Math.max(pr,100-pr)}%`;
+    return `<div class="card match ${mine&&mid?'mine':''}"><div class="mh"><b>${matchLabel(m)}</b><span>${m.field?esc(m.field)+' · ':''}${m.time?new Date(m.time).toLocaleTimeString([], {hour:'2-digit',minute:'2-digit'}):''}</span><span class="badge ${m.scored?'done':''}">${win}</span></div>
+      <div class="sides">${side(m.red,'red',p.red)}${side(m.blue,'blue',p.blue)}</div>
+      <div class="bar"><i class="r" style="width:${pr}%"></i><i class="b" style="width:${100-pr}%"></i></div></div>`;
+  }).join('');
+}
+
+function rowData(c){
+  return c.ids.map(id=>{
+    const r=c.rk.get(id)||{}; const st=c.model.stats.get(id)||{}; const sk=S.skills.get(id)||{};
+    const n=(S.notes[evKey()]||{})[tnum(id)];
+    return {id,num:tnum(id),rank:r.rank??999,epa:c.model.epa.get(id),opr:c.model.opr.get(id),dpr:c.model.dpr.get(id),ccwm:c.model.ccwm.get(id),
+      avg:st.avg,high:st.high,sigma:st.sigma,wp:r.wp,ap:r.ap,sp:r.sp,w:r.w,l:r.l,t:r.t,driver:sk.driver||0,prog:sk.prog||0,skr:sk.rank,note:n,vio:(n&&n.vio)||0};
+  });
+}
+function viewTeams(c){
+  let rows=rowData(c); const q=S.search.trim().toUpperCase();
+  if(q) rows=rows.filter(r=>r.num.includes(q)||(S.teams.get(r.id).name||'').toUpperCase().includes(q));
+  const {k,dir}=S.sort; rows.sort((a,b)=>{ const x=a[k],y=b[k]; if(x==null&&y==null) return 0; if(x==null) return 1; if(y==null) return -1; return typeof x==='string'?x.localeCompare(y)*dir:(x-y)*dir; });
+  const cols=[['rank','Rk'],['num','Team'],['epa','EPA'],['opr','OPR'],['dpr','DPR'],['ccwm','CCWM'],['avg','Avg'],['high','High'],['sigma','σ'],['wp','WP'],['ap','AP'],['sp','SP'],['driver','Drv'],['prog','Prog'],['vio','Vio']];
+  const mid=myId(); const pl=S.picklist[evKey()]||[];
+  return `<div class="toolbar"><input id="search" placeholder="Search team or name" value="${esc(S.search)}"><button class="btn ghost sm" data-act="csv">Export CSV</button></div>
+  <div class="tw"><table><thead><tr>${cols.map(([kk,l])=>`<th data-sort="${kk}">${l}${kk===k?(dir>0?' ▲':' ▼'):''}</th>`).join('')}<th></th></tr></thead><tbody>
+  ${rows.map(r=>`<tr class="${r.id===mid?'me':''}"><td>${r.rank===999?'-':r.rank}</td><td><span class="team" data-team="${r.id}">${esc(r.num)}</span>${r.note&&r.note.tags&&r.note.tags.length?' 🏷':''}</td><td><b>${f1(r.epa)}</b></td><td>${f1(r.opr)}</td><td>${f1(r.dpr)}</td><td>${f1(r.ccwm)}</td><td>${f1(r.avg)}</td><td>${r.high??'-'}</td><td>${f1(r.sigma)}</td><td>${r.wp??'-'}</td><td>${r.ap??'-'}</td><td>${r.sp??'-'}</td><td>${r.driver||'-'}</td><td>${r.prog||'-'}</td><td>${r.vio?`<b style="color:var(--red)">${r.vio}</b>`:'0'}</td><td>${pl.includes(r.num)?'✔':`<button class="btn ghost sm" data-addpl="${esc(r.num)}">+</button>`}</td></tr>`).join('')}
+  </tbody></table></div><p class="sub">EPA = expected points this team adds to an alliance (ridge model on qual scores${S.settings.usePrior&&S.prior.length?', blended with earlier events this season':''}). σ = how much its alliance scores swing. Tap a header to sort.</p>`;
+}
+
+function computePicksData(c){
+  const ids=c.ids; const vio=new Map(ids.map(i=>[i,vioOf(i)])); const score=pickScorer(c.model,S.skills,ids,vio); const me=myId();
+  const nAll=Math.max(1,Math.min(+S.settings.alliances||8,Math.floor(ids.length/2)));
+  const sim=me!=null?simulateSelection(c.order,score,nAll,me):null;
+  const meE=me!=null?(c.model.epa.get(me)??c.model.mu):0;
+  const cands=ids.filter(x=>x!==me).map(id=>{
+    const e=c.model.epa.get(id)??c.model.mu; const alli=me!=null?meE+e:e;
+    const gone=sim?sim.gone.has(id):false;
+    return {id,score:score(id),epa:e,alli,vsAvg:normCdf((alli-(me!=null?2:1)*c.model.mu)/(Math.SQRT2*c.model.rmse)),gone,by:sim&&sim.pickedBy.get(id)};
+  }).sort((a,b)=>b.score-a.score);
+  return {nAll,sim,cands,me,meE};
+}
+function reasons(c,x){
+  const st=c.model.stats.get(x.id)||{}, sk=S.skills.get(x.id)||{}; const out=[];
+  const ranks=[...c.ids].sort((a,b)=>(c.model.epa.get(b)||0)-(c.model.epa.get(a)||0)); const er=ranks.indexOf(x.id)+1; out.push(`EPA #${er} (${f1(x.epa)})`);
+  if(sk.prog) out.push(`prog skills ${sk.prog}`); if(sk.driver) out.push(`driver ${sk.driver}`);
+  if(st.sigma!=null&&st.sigma<=c.model.rmse*0.85) out.push('steady'); else if(st.sigma!=null&&st.sigma>c.model.rmse*1.2) out.push('swingy');
+  if((st.games||0)<3) out.push('few matches'); const vv=vioOf(x.id); if(vv) out.push(vv+' violation'+(vv>1?'s':''));
+  const n=(S.notes[evKey()]||{})[tnum(x.id)]; if(n&&n.tags&&n.tags.length) out.push(n.tags.join(', '));
+  return out.join(' · ');
+}
+function viewPicks(c){
+  const P=computePicksData(c); const pl=S.picklist[evKey()]||[]; let h='';
+  const meN=myNum();
+  if(P.me==null) h+=`<div class="banner info">${meN?`Team ${esc(meN)} is not in this division, so this is a general ranked picklist.`:'No team set in Settings, so this is a general ranked picklist.'}</div>`;
+  else{
+    const rk=c.rk.get(P.me); const s=P.sim; let msg='';
+    const rname=rk?`Rank ${rk.rank}`:'No rank yet';
+    if(s.status==='captain') msg=`You are projected as an alliance captain (${rname}, ${P.nAll} alliances). Picks below are what should be left when you choose.`;
+    else if(s.status==='picked') msg=`At ${rname} you are projected to be picked by ${esc(tnum(s.myPickedBy))}. Know your best captains below, and see who you would pick if you climb.`;
+    else msg=`At ${rname} you sit outside the top ${P.nAll}. You would be picked, not picking. The list shows who you would want as a partner.`;
+    h+=`<div class="card"><h3>4613A situation</h3><div class="sub" style="font-size:13px">${msg}</div><div class="kv" style="margin-top:8px"><div><small>Your EPA</small><b>${f1(P.meE)}</b></div><div><small>Rank</small><b>${rk?rk.rank:'-'}</b></div><div><small>Alliances</small><b>${P.nAll}</b></div></div><p class="sub">Projection uses current ranks and assumes every captain takes the best available EPA. Early in qualifying it will move a lot.</p></div>`;
+  }
+  const top=P.cands.filter(x=>!x.gone).slice(0,8), gone=P.cands.filter(x=>x.gone).slice(0,6);
+  const item=(x,i)=>`<div class="card pick ${x.gone?'gone':''}"><div class="n">${i+1}</div><div class="body"><div>${teamLink(x.id)} <span class="sub">${esc((S.teams.get(x.id)||{}).name||'')}</span></div><div class="sub">${esc(reasons(c,x))}</div>${x.gone?`<div class="sub">Likely taken by ${x.by!=null?esc(tnum(x.by)):'a captain'}</div>`:''}</div><div class="sc"><div>${f1(x.alli)}</div><div class="sub">${Math.round(x.vsAvg*100)}% vs avg</div>${pl.includes(tnum(x.id))?'✔':`<button class="btn ghost sm" data-addpl="${esc(tnum(x.id))}">+ list</button>`}</div></div>`;
+  h+=`<h3>${P.me!=null?'Best partners likely available':'Top teams'}</h3>`+(top.length?top.map(item).join(''):'<div class="empty">Not enough data yet.</div>');
+  if(gone.length) h+=`<h3>Strong but probably gone</h3>`+gone.map(item).join('');
+  if(P.sim&&P.sim.pairs.length) h+=`<div class="card"><h3>Projected picks before you</h3><div class="sub">${P.sim.pairs.map(([a,b])=>`${esc(tnum(a))} → ${esc(tnum(b))}`).join('<br>')}</div></div>`;
+  h+=`<p class="sub">Score blends EPA (main weight), programming skills, driver skills and consistency. "Alliance" number is your EPA plus theirs. % vs avg is the chance that alliance beats an average one.</p>`;
+  return h;
+}
+function viewPicklist(c){
+  const k=evKey(); const pl=S.picklist[k]||[];
+  return `<div class="toolbar"><button class="btn sm" data-act="autoPl">Auto-fill from picks</button><button class="btn ghost sm" data-act="copyPl">Copy</button><button class="btn ghost sm" data-act="clearPl">Clear</button></div>
+  ${pl.length?`<div class="card"><ul class="list" id="plist">${pl.map((n,i)=>{const id=S.numToId.get(n);const e=id!=null?c.model.epa.get(id):null;return `<li draggable="true" data-pl="${i}"><b>${i+1}</b><span class="grow"><span class="team" data-team="${id}">${esc(n)}</span> <span class="sub">EPA ${f1(e)}</span></span><button class="btn ghost sm" data-up="${i}">↑</button><button class="btn ghost sm" data-down="${i}">↓</button><button class="btn ghost sm" data-rmpl="${i}">✕</button></li>`}).join('')}</ul></div>`:'<div class="empty">Your picklist is empty. Add teams with + on the Teams or Picks tab.</div>'}`;
+}
+
+function viewSettings(){
+  const s=S.settings;
+  return `<div class="card"><h3>Event</h3>
+    <div class="toolbar"><button class="btn" data-act="findState">Find NSW State Championships (HS)</button><button class="btn ghost" data-act="findMine">Find my team's events</button></div>
+    ${S.found.length?`<ul class="list">${S.found.map(e=>`<li data-sku="${esc(e.sku)}" style="cursor:pointer"><span class="grow"><b>${esc(e.name)}</b><div class="sub">${esc(e.sku)} · ${new Date(e.start).toLocaleDateString()}</div></span><button class="btn sm">Load</button></li>`).join('')}</ul>`:''}
+    <label>Or enter an event SKU (like RE-V5RC-26-1234)</label><div class="toolbar"><input id="sku" value="${esc(s.sku)}" placeholder="RE-V5RC-26-XXXX"><button class="btn" data-act="loadSku">Load</button></div>
+    <div class="toolbar"><button class="btn ghost" data-act="demo">Try demo event</button></div></div>
+  <div class="card"><h3>My team</h3><label>Team number (leave blank to see all matches)</label><input id="team" value="${esc(s.team)}" placeholder="4613A">
+    <label>Number of alliances for pick projection</label><input id="alliances" type="number" min="2" max="16" value="${+s.alliances||8}"></div>
+  <div class="card"><h3>RobotEvents API</h3><label>API key (stored only in this browser)</label><input id="apiKey" type="password" value="${esc(s.apiKey)}" placeholder="eyJ...">
+    <label>Proxy URL (optional, only if the browser blocks direct calls)</label><input id="proxy" value="${esc(s.proxy)}" placeholder="https://your-worker.workers.dev"></div>
+  <div class="card"><h3>Options</h3>
+    <label><input type="checkbox" id="usePrior" style="width:auto" ${s.usePrior?'checked':''}> Blend in earlier events this season to firm up EPA</label>
+    <label>Auto refresh</label><select id="refresh">${[[0,'Off'],[60,'Every minute'],[120,'Every 2 minutes'],[300,'Every 5 minutes']].map(([v,l])=>`<option value="${v}" ${+s.refresh===v?'selected':''}>${l}</option>`).join('')}</select>
+    <label>Theme</label><select id="dark"><option value="auto" ${s.dark===null?'selected':''}>Match device</option><option value="0" ${s.dark===false?'selected':''}>Light</option><option value="1" ${s.dark===true?'selected':''}>Dark</option></select>
+    <div class="toolbar" style="margin-top:10px"><button class="btn" data-act="saveSettings">Save settings</button><button class="btn ghost" data-act="exportNotes">Export notes</button><button class="btn ghost" data-act="importNotes">Import notes</button></div>
+    <input type="file" id="importFile" accept="application/json" style="display:none"></div>
+  <p class="sub">Notes, picklist and settings live in this browser only. Export notes to share with teammates.</p>`;
+}
+
+// ======================= TEAM MODAL =======================
+function openTeam(id){
+  const c=cur(); if(!c) return; const num=tnum(id); const t=S.teams.get(id)||{};
+  const r=rowData(c).find(x=>x.id===id)||{}; const k=evKey(); const note=((S.notes[k]||{})[num])||{rating:0,reliability:0,drive:'',auto:'',text:'',tags:[],vio:0};
+  const tags=['Pick','Avoid','Strong auto','Defender','Fast cycles','Unreliable','Good driver'];
+  const ms=(S.matches[S.div]||[]).filter(m=>[...m.red.teams,...m.blue.teams].some(x=>x.id===id));
+  const tr=(c.trend.get?c.trend.get(id):null)||c.trend.get(id);
+  const stars=(key,v)=>`<div class="stars" data-stars="${key}">${[1,2,3,4,5].map(i=>`<button class="${i<=v?'on':''}" data-v="${i}">★</button>`).join('')}</div>`;
+  $('#dlg').innerHTML=`<div class="dh"><b>${esc(num)} <span class="sub">${esc(t.name||'')}</span></b><button class="btn ghost sm" data-act="closeDlg">Close</button></div><div class="db">
+   <div class="sub">${esc(t.org||'')} ${t.city?'· '+esc(t.city):''}</div>
+   <div class="kv" style="margin:8px 0"><div><small>EPA</small><b>${f1(r.epa)}</b></div><div><small>Rank</small><b>${r.rank===999?'-':r.rank}</b></div><div><small>Record</small><b>${r.w??'-'}-${r.l??'-'}-${r.t??'-'}</b></div><div><small>OPR / DPR</small><b>${f1(r.opr)} / ${f1(r.dpr)}</b></div><div><small>Avg / High</small><b>${f1(r.avg)} / ${r.high??'-'}</b></div><div><small>Skills D / P</small><b>${r.driver||'-'} / ${r.prog||'-'}</b></div><div><small>Swing σ</small><b>${f1(r.sigma)}</b></div><div><small>WP AP SP</small><b>${r.wp??'-'} ${r.ap??'-'} ${r.sp??'-'}</b></div></div>
+   ${tr&&tr.length>1?`<h3>EPA over the event</h3>${spark(tr)}`:''}
+   <h3>Scouting notes</h3>
+   <div>${tags.map(g=>`<span class="chip ${note.tags.includes(g)?'on':''}" data-tag="${g}">${g}</span>`).join('')}</div>
+   <label>Violations</label><div class="toolbar"><button class="btn ghost" data-vio="-1">−</button><b id="vioN" style="font-size:20px;min-width:30px;text-align:center">${note.vio||0}</b><button class="btn ghost" data-vio="1">+</button><span class="sub">saves instantly</span></div>
+   <div class="row2"><div><label>Robot rating</label>${stars('rating',note.rating)}</div><div><label>Reliability</label>${stars('reliability',note.reliability)}</div></div>
+   <div class="row2"><div><label>Drivetrain / build</label><input id="nDrive" value="${esc(note.drive)}"></div><div><label>Auto routine</label><input id="nAuto" value="${esc(note.auto)}"></div></div>
+   <label>Notes</label><textarea id="nText" rows="3">${esc(note.text)}</textarea>
+   <div class="toolbar" style="margin-top:8px"><button class="btn" data-act="saveNote" data-num="${esc(num)}">Save note</button><button class="btn ghost" data-addpl="${esc(num)}">Add to picklist</button></div>
+   <h3>Matches</h3>
+   <ul class="list">${ms.map(m=>{const onRed=m.red.teams.some(x=>x.id===id);const my=onRed?m.red:m.blue,op=onRed?m.blue:m.red;const p=predictMatch(c.model,m);const pw=onRed?p.pRed:1-p.pRed;
+     const res=m.scored?(my.score>op.score?'W':my.score<op.score?'L':'T')+` ${my.score}-${op.score}`:`pred ${Math.round(pw*100)}%`;
+     return `<li><b style="width:54px">${matchLabel(m)}</b><span class="grow sub">${onRed?'Red':'Blue'} · with ${my.teams.filter(x=>x.id!==id).map(x=>x.num).join(', ')||'-'} vs ${op.teams.map(x=>x.num).join(', ')}</span><span>${res}</span></li>`}).join('')}</ul></div>`;
+  $('#dlg').dataset.team=id; $('#dlg').dataset.stars=JSON.stringify({rating:note.rating,reliability:note.reliability,tags:note.tags});
+  $('#dlg').showModal();
+}
+function spark(tr){
+  const w=300,h=70,p=6; const xs=tr.map(a=>a.m),ys=tr.map(a=>a.v); const x0=Math.min(...xs),x1=Math.max(...xs),y0=Math.min(...ys),y1=Math.max(...ys);
+  const X=v=>p+(x1===x0?0:(v-x0)/(x1-x0))*(w-2*p), Y=v=>h-p-(y1===y0?0.5:(v-y0)/(y1-y0))*(h-2*p);
+  return `<svg viewBox="0 0 ${w} ${h}" width="100%" height="70"><polyline fill="none" stroke="var(--accent)" stroke-width="2.5" points="${tr.map(a=>X(a.m)+','+Y(a.v)).join(' ')}"/>${tr.map(a=>`<circle cx="${X(a.m)}" cy="${Y(a.v)}" r="3" fill="var(--accent)"/>`).join('')}<text x="${p}" y="12" font-size="10" fill="var(--mute)">${f1(y1)}</text><text x="${p}" y="${h-1}" font-size="10" fill="var(--mute)">${f1(y0)}</text></svg>`;
+}
+
+// ======================= ACTIONS =======================
+function addPl(num){ const k=evKey(); const l=S.picklist[k]||(S.picklist[k]=[]); if(!l.includes(num)) l.push(num); LS.set('vs.picklist',S.picklist); render(); }
+function toast(t){ S.status=t; $('#hSub').textContent=t; }
+function csv(){
+  const c=cur(); if(!c) return; const rows=rowData(c);
+  const head=['Rank','Team','Name','Org','EPA','OPR','DPR','CCWM','AvgScore','HighScore','Sigma','WP','AP','SP','DriverSkills','ProgSkills','Violations','Rating','Reliability','Tags','Drive','Auto','Notes'];
+  const q=v=>`"${String(v??'').replace(/"/g,'""')}"`;
+  const lines=[head.join(',')].concat(rows.map(r=>{const t=S.teams.get(r.id)||{};const n=r.note||{};return [r.rank===999?'':r.rank,r.num,t.name,t.org,f1(r.epa),f1(r.opr),f1(r.dpr),f1(r.ccwm),f1(r.avg),r.high,f1(r.sigma),r.wp,r.ap,r.sp,r.driver,r.prog,n.vio||0,n.rating,n.reliability,(n.tags||[]).join('; '),n.drive,n.auto,n.text].map(q).join(',')}));
+  download('scouting-'+evKey()+'.csv',lines.join('\n'),'text/csv');
+}
+function download(name,text,type){ const a=document.createElement('a'); a.href=URL.createObjectURL(new Blob([text],{type})); a.download=name; a.click(); setTimeout(()=>URL.revokeObjectURL(a.href),2000); }
+function readSettingsForm(){
+  const g=id=>{const e=document.getElementById(id);return e};
+  if(!g('team')) return;
+  S.settings.team=g('team').value.trim().toUpperCase(); S.settings.alliances=+g('alliances').value||8;
+  S.settings.apiKey=g('apiKey').value.trim(); S.settings.proxy=g('proxy').value.trim();
+  S.settings.usePrior=g('usePrior').checked; S.settings.refresh=+g('refresh').value;
+  const d=g('dark').value; S.settings.dark=d==='auto'?null:d==='1';
+  saveSettings(); setupTimer();
+}
+function setupTimer(){ clearInterval(S.timer); if(S.settings.refresh>0&&!S.demo) S.timer=setInterval(()=>{ if(S.event&&!S.loading) refreshData(false); },S.settings.refresh*1000); }
+async function findState(){
+  readSettingsForm(); S.error=''; S.found=[]; toast('Searching events...');
+  try{
+    const now=Date.now(); const ev=await apiAll('/events',{start:new Date(now-5*864e5).toISOString(),end:new Date(now+21*864e5).toISOString(),program:[1]});
+    let hits=ev.filter(e=>/NSW/i.test(e.name)&&/state/i.test(e.name));
+    hits.sort((a,b)=>(/\(HS\)/i.test(b.name)?1:0)-(/\(HS\)/i.test(a.name)?1:0));
+    S.found=hits; if(!hits.length) S.error='No NSW State Championships found in the next 3 weeks. Try "Find my team\'s events" or enter the SKU from robotevents.com.';
+    else if(hits.length===1||/\(HS\)/i.test(hits[0].name)&&!/\(HS\)/i.test(hits[1]?hits[1].name:'')) { await loadEvent(hits[0].sku); return; }
+  }catch(e){ S.error=errText(e); }
+  render();
+}
+async function findMine(){
+  readSettingsForm(); S.error=''; S.found=[]; toast('Searching...');
+  try{
+    const tm=await apiAll('/teams',{number:[myNum()],program:[1]}); if(!tm.length) throw new Error('Team not found');
+    const y=new Date().getMonth()>=5?new Date().getFullYear():new Date().getFullYear()-1;
+    const ev=await apiAll('/teams/'+tm[0].id+'/events',{start:new Date(y,5,1).toISOString()});
+    S.found=ev.sort((a,b)=>new Date(b.start)-new Date(a.start)); if(!ev.length) S.error='No events found for '+myNum();
+  }catch(e){ S.error=e.status?errText(e):(e.message||errText(e)); }
+  render();
+}
+
+// ======================= EVENTS =======================
+document.addEventListener('click',async ev=>{
+  const t=ev.target.closest('[data-tab],[data-act],[data-team],[data-filter],[data-sort],[data-addpl],[data-sku],[data-up],[data-down],[data-rmpl],[data-tag],[data-v],[data-vio]');
+  if(!t) return;
+  const d=t.dataset;
+  if(d.tab){ if(S.tab==='settings') readSettingsForm(); S.tab=d.tab; render(); window.scrollTo(0,0); return; }
+  if(d.team&&!d.act){ openTeam(+d.team); return; }
+  if(d.filter){ S.filter=d.filter; render(); return; }
+  if(d.sort){ S.sort=S.sort.k===d.sort?{k:d.sort,dir:-S.sort.dir}:{k:d.sort,dir:d.sort==='num'||d.sort==='rank'||d.sort==='dpr'?1:-1}; render(); return; }
+  if(d.addpl){ addPl(d.addpl); return; }
+  if(d.sku){ S.demo=false; await loadEvent(d.sku); S.tab='matches'; render(); return; }
+  if(d.up!==undefined||d.down!==undefined||d.rmpl!==undefined){
+    const l=S.picklist[evKey()]||[]; const i=+(d.up??d.down??d.rmpl);
+    if(d.up!==undefined&&i>0) [l[i-1],l[i]]=[l[i],l[i-1]]; if(d.down!==undefined&&i<l.length-1) [l[i+1],l[i]]=[l[i],l[i+1]]; if(d.rmpl!==undefined) l.splice(i,1);
+    LS.set('vs.picklist',S.picklist); render(); return;
+  }
+  const dlg=$('#dlg');
+  if(d.vio){ const num=tnum(+dlg.dataset.team); const k=evKey(); const nn=(S.notes[k]||(S.notes[k]={})); const o=nn[num]||(nn[num]={rating:0,reliability:0,drive:'',auto:'',text:'',tags:[]}); o.vio=Math.max(0,(o.vio||0)+(+d.vio)); LS.set('vs.notes',S.notes); $('#vioN').textContent=o.vio; return; }
+  if(d.tag){ const st=JSON.parse(dlg.dataset.stars); st.tags=st.tags.includes(d.tag)?st.tags.filter(x=>x!==d.tag):st.tags.concat(d.tag); dlg.dataset.stars=JSON.stringify(st); t.classList.toggle('on'); return; }
+  if(d.v){ const key=t.parentElement.dataset.stars; const st=JSON.parse(dlg.dataset.stars); st[key]=+d.v; dlg.dataset.stars=JSON.stringify(st); [...t.parentElement.children].forEach((b,i)=>b.classList.toggle('on',i<+d.v)); return; }
+  switch(d.act){
+    case 'closeDlg': dlg.close(); render(); break;
+    case 'saveNote':{ const st=JSON.parse(dlg.dataset.stars); const k=evKey(); { const prev=(S.notes[k]||(S.notes[k]={}))[d.num]||{}; S.notes[k][d.num]={vio:prev.vio||0,rating:st.rating,reliability:st.reliability,tags:st.tags,drive:$('#nDrive').value,auto:$('#nAuto').value,text:$('#nText').value,ts:Date.now()}; } LS.set('vs.notes',S.notes); dlg.close(); render(); break; }
+    case 'goSettings': S.tab='settings'; render(); break;
+    case 'saveSettings': readSettingsForm(); computeAll(); S.error=''; render(); toast('Settings saved'); break;
+    case 'loadSku': readSettingsForm(); S.demo=false; { const v=$('#sku').value.trim(); if(v){ await loadEvent(v); S.tab='matches'; render(); } } break;
+    case 'findState': await findState(); break;
+    case 'findMine': await findMine(); break;
+    case 'demo': S.demo=true; S.settings.team='4613A'; await loadEvent('DEMO-V5RC-26-0001'); S.tab='matches'; render(); break;
+    case 'csv': csv(); break;
+    case 'autoPl':{ const c=cur(); const P=computePicksData(c); S.picklist[evKey()]=P.cands.slice(0,12).map(x=>tnum(x.id)); LS.set('vs.picklist',S.picklist); render(); break; }
+    case 'copyPl':{ const l=S.picklist[evKey()]||[]; try{await navigator.clipboard.writeText(l.map((n,i)=>(i+1)+'. '+n).join('\n')); toast('Copied');}catch(e){ toast('Copy blocked by browser'); } break; }
+    case 'clearPl': S.picklist[evKey()]=[]; LS.set('vs.picklist',S.picklist); render(); break;
+    case 'exportNotes': download('scout-notes-'+evKey()+'.json',JSON.stringify({notes:S.notes[evKey()]||{},picklist:S.picklist[evKey()]||[]},null,1),'application/json'); break;
+    case 'importNotes': $('#importFile').click(); break;
+  }
+});
+document.addEventListener('change',async ev=>{
+  if(ev.target.id==='divSel'){ S.div=+ev.target.value; render(); }
+  if(ev.target.id==='importFile'){ const f=ev.target.files[0]; if(!f) return; try{ const j=JSON.parse(await f.text()); const k=evKey(); S.notes[k]=Object.assign(S.notes[k]||{},j.notes||{}); if(j.picklist&&j.picklist.length) S.picklist[k]=j.picklist; LS.set('vs.notes',S.notes); LS.set('vs.picklist',S.picklist); toast('Imported'); render(); }catch(e){ S.error='Could not read that file.'; render(); } }
+});
+document.addEventListener('input',ev=>{ if(ev.target.id==='search'){ S.search=ev.target.value; const p=ev.target.selectionStart; render(); const el=$('#search'); el.focus(); el.setSelectionRange(p,p); } });
+// drag to reorder picklist (desktop)
+let dragI=null;
+document.addEventListener('dragstart',e=>{ const li=e.target.closest('[data-pl]'); if(li) dragI=+li.dataset.pl; });
+document.addEventListener('dragover',e=>{ if(e.target.closest('[data-pl]')) e.preventDefault(); });
+document.addEventListener('drop',e=>{ const li=e.target.closest('[data-pl]'); if(li&&dragI!==null){ const l=S.picklist[evKey()]; const [x]=l.splice(dragI,1); l.splice(+li.dataset.pl,0,x); dragI=null; LS.set('vs.picklist',S.picklist); render(); } });
+$('#refreshBtn').addEventListener('click',()=>{ readSettingsForm(); if(S.event) refreshData(false); else { S.tab='settings'; render(); } });
+
+// ======================= DEMO DATA =======================
+const DEMO={};
+function demoInit(){
+  if(DEMO.ready) return; DEMO.ready=true;
+  let seed=7; const rnd=()=>(seed=(seed*16807)%2147483647)/2147483647; const gauss=()=>{let u=0;for(let i=0;i<6;i++)u+=rnd();return (u-3)/Math.sqrt(0.5)*0.7;};
+  const nums=['4613A','4613R','1234B','2200C','3100D','5050E','6001F','7777G','8800H','9090J','1010K','2020L','3030M','4040N','5151P','6262Q','7373R','8484S','9595T','1111U','2222V','3333W','4444X','5555Y'];
+  DEMO.teams=nums.map((n,i)=>({id:1000+i,number:n,team_name:'Demo Team '+n,organization:'Demo School '+(i+1),location:{city:'Sydney'},skill:(i===0?26:8+rnd()*28)}));
+  const T=DEMO.teams; DEMO.matches=[]; let num=1;
+  for(let round=0;round<6;round++){
+    const order=T.map(t=>t.id).sort(()=>rnd()-0.5);
+    for(let i=0;i<order.length;i+=4){ DEMO.matches.push({id:num,round:2,instance:1,matchnum:num,field:'Field '+(1+num%2),scheduled:new Date(Date.now()+(num-24)*8*60000).toISOString(),red:[order[i],order[i+1]],blue:[order[i+2],order[i+3]]}); num++; }
+  }
+  const byId=new Map(T.map(t=>[t.id,t])); const playedUpTo=26;
+  DEMO.matches.forEach(m=>{ m.scored=m.matchnum<=playedUpTo; const sc=ids=>Math.max(0,Math.round(ids.reduce((s,id)=>s+byId.get(id).skill,0)+gauss()*8)); m.rs=sc(m.red); m.bs=sc(m.blue); m.started=m.scored?m.scheduled:null; });
+  DEMO.skills=T.map(t=>({team:{id:t.id,name:t.number},type:'programming',score:Math.round(t.skill*1.2+rnd()*8),rank:0})).concat(T.map(t=>({team:{id:t.id,name:t.number},type:'driver',score:Math.round(t.skill*1.5+rnd()*10),rank:0})));
+}
+function demoApi(path,params,page){
+  demoInit(); const wrap=d=>({meta:{current_page:1,last_page:1},data:d}); const T=DEMO.teams;
+  const tm=id=>{const t=T.find(x=>x.id===id);return {id:t.id,name:t.number,code:t.number};};
+  if(path==='/events') return wrap([{id:9001,sku:'DEMO-V5RC-26-0001',name:'DEMO | NSW | State Championships (HS)',start:new Date().toISOString(),season:{id:190},divisions:[{id:1,name:'Division 1',order:1}]}]);
+  if(/\/teams$/.test(path)) return wrap(T);
+  if(/\/matches$/.test(path)&&path.indexOf('/divisions/')>0) return wrap(DEMO.matches.map(m=>({id:m.id,round:m.round,instance:m.instance,matchnum:m.matchnum,field:m.field,scheduled:m.scheduled,started:m.started,scored:m.scored,alliances:[{color:'red',score:m.scored?m.rs:0,teams:m.red.map(id=>({team:tm(id)}))},{color:'blue',score:m.scored?m.bs:0,teams:m.blue.map(id=>({team:tm(id)}))}]})));
+  if(/\/rankings$/.test(path)){
+    const r=new Map(T.map(t=>[t.id,{team:tm(t.id),wins:0,losses:0,ties:0,wp:0,ap:0,sp:0,high_score:0}]));
+    DEMO.matches.filter(m=>m.scored).forEach(m=>{ for(const [side,own,opp] of [['red',m.rs,m.bs],['blue',m.bs,m.rs]]) for(const id of m[side]){ const x=r.get(id); const win=own>opp, tie=own===opp; x.wins+=win?1:0; x.losses+=(!win&&!tie)?1:0; x.ties+=tie?1:0; x.wp+=win?2:tie?1:0; x.sp+=Math.min(own,opp); x.high_score=Math.max(x.high_score,own);} });
+    const arr=[...r.values()].sort((a,b)=>b.wp-a.wp||b.sp-a.sp); arr.forEach((x,i)=>x.rank=i+1); return wrap(arr);
+  }
+  if(/\/skills$/.test(path)) return wrap(DEMO.skills);
+  if(/\/teams\/\d+\/matches$/.test(path)) return wrap([]);
+  return wrap([]);
+}
+
+// ======================= START =======================
+setupTimer();
+if(!S.settings.apiKey&&!S.settings.sku) S.tab='settings';
+render();
+if(S.settings.sku&&S.settings.apiKey) loadEvent(S.settings.sku);
+</script>
+</body>
+</html>
