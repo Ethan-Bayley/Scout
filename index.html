@@ -278,7 +278,7 @@ async function apiOnce(path,params,page){
   u.searchParams.set('per_page','250'); u.searchParams.set('page',page);
   const h={Accept:'application/json'}; if(S.settings.apiKey) h.Authorization='Bearer '+S.settings.apiKey.trim();
   const r=await fetch(u.toString(),{method:'GET',headers:h});
-  if(!r.ok){ const e=new Error('HTTP '+r.status); e.status=r.status; throw e; }
+  if(!r.ok){ let body=''; try{ body=(await r.text()).slice(0,160); }catch(x){} const e=new Error('HTTP '+r.status+' from '+u.origin+u.pathname+(body?' - '+body:'')); e.status=r.status; throw e; }
   return r.json();
 }
 async function apiAll(path,params){
@@ -298,6 +298,7 @@ function errText(e){
   if(e.status===401||e.status===403) return 'RobotEvents rejected the API key. Check it in Settings.';
   if(e.status===429) return 'Rate limited by RobotEvents. Wait a minute then refresh.';
   if(e instanceof TypeError&&/fetch|network|load failed/i.test(e.message)) return 'The browser blocked the request (network or CORS). Check wifi, or set up the proxy from the README and paste its URL in Settings.';
+  if(e.status===404) return 'Not found ('+e.message+'). Check the Proxy URL has no extra path, or clear it to call RobotEvents directly.';
   return 'Request failed ('+(e.name||'Error')+': '+e.message+').';
 }
 async function pool(items,n,fn){
